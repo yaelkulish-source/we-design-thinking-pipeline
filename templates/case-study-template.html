@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Sprint — Case Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /*
+    ============================================================================
+    THIS IS A TEMPLATE. Copy it to design-sprint/<slug>/case-study.html at the
+    start of stage 1 (see SKILL.md's "Sprint state" section). Do not edit THIS
+    file in /templates/ — edit the per-project copy.
+
+    Default tokens below are neutral placeholders. Stage 7 (Design System)
+    overwrites the CSS variables in :root once it runs — see the
+    "STAGE 7 REPLACES THIS BLOCK" marker. Until stage 7 runs, the page uses
+    this neutral palette rather than inventing one.
+    ============================================================================
+  */
+  :root{
+    /* STAGE 7 REPLACES THIS BLOCK — neutral placeholder tokens until then */
+    --canvas:#FAFAF9; --surface:#FFFFFF; --surface-2:#F1F1EE;
+    --ink:#14151A; --ink-dim:#6B6F76;
+    --accent:#3B6E8F; --accent-warn:#9A6B2F; --hairline:#E3E3DE;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{ background:var(--canvas); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; min-height:100vh; }
+  .mono{ font-family:'IBM Plex Mono', monospace; }
+  .present-btn{ background:rgba(59,110,143,0.09); color:var(--accent); border:1px solid rgba(59,110,143,0.3); border-radius:999px; padding:6px 14px; font-size:12px; font-weight:500; cursor:pointer; }
+
+  header{ padding:20px 32px 0; max-width:920px; margin:0 auto; }
+  .brand{ display:flex; align-items:center; gap:8px; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-dim); margin-bottom:16px; }
+  .brand-mark{ width:6px;height:6px;border-radius:50%; background:var(--accent); }
+  h1{ font-size:24px; font-weight:600; margin:0 0 8px; }
+  .subtitle{ color:var(--ink-dim); font-size:14px; margin-bottom:18px; max-width:620px; line-height:1.6; }
+
+  /* ===== Sprint Map: data-driven, mechanical — orchestrator edits #sprint-data JSON, not this markup ===== */
+  .sprintmap{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+  .sm-item{ font-size:11px; color:var(--ink-dim); background:var(--surface); border:1px solid var(--hairline); border-radius:999px; padding:5px 10px 5px 6px; display:flex; align-items:center; gap:6px; }
+  .sm-item .sm-n{ font-family:'IBM Plex Mono', monospace; font-size:10px; border-radius:999px; padding:1px 6px; background:var(--surface-2); }
+  .sm-item.status-done .sm-n{ background:rgba(59,110,143,0.09); color:var(--accent); }
+  .sm-item.status-in_progress{ border-color:var(--accent-warn); }
+  .sm-item.status-current{ border-color:var(--accent); }
+  .sm-item .sm-link{ color:var(--accent); text-decoration:none; font-size:10px; margin-right:2px; }
+  .lifecycle-note{ font-size:10px; color:var(--ink-dim); font-family:'IBM Plex Mono',monospace; margin-bottom:14px; }
+
+  .tabs{ display:flex; gap:4px; border-bottom:1px solid var(--hairline); }
+  .tab{ padding:10px 16px; font-size:13px; color:var(--ink-dim); cursor:pointer; border-bottom:2px solid transparent; }
+  .tab.active{ color:var(--ink); border-bottom-color:var(--accent); }
+
+  main{ max-width:920px; margin:0 auto; padding:24px 32px 70px; }
+  .view{ display:none; } .view.active{ display:block; }
+  .empty-view{ color:var(--ink-dim); font-size:13px; padding:40px 0; text-align:center; border:1px dashed var(--hairline); border-radius:10px; }
+
+  .thesis-block{ background:var(--surface); border:1px solid var(--hairline); border-left:3px solid var(--accent); border-radius:8px; padding:16px 18px; margin-bottom:20px; font-size:14px; line-height:1.7; }
+  .thesis-label{ font-size:10.5px; color:var(--accent); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
+
+  /* ===== Presenter / Audience system — identical mechanism across every project ===== */
+  .slidedeck{ display:none; }
+  body.role-audience .maindoc{ display:none; } body.role-presenter .maindoc{ display:none; }
+  body.role-audience .slidedeck.audience{ display:flex; } body.role-presenter .slidedeck.presenter{ display:flex; }
+  .slide-audience{ width:100vw; height:100vh; background:#14151A; color:#F2F1ED; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:60px 80px; position:relative; }
+  .slide-audience .sl-eyebrow{ color:#7FB0C9; font-size:14px; letter-spacing:.08em; text-transform:uppercase; margin-bottom:18px; }
+  .slide-audience .sl-quote{ font-size:32px; font-weight:600; line-height:1.35; max-width:800px; margin-bottom:24px; }
+  .slide-audience .sl-quote::before{ content:"\201C"; color:#7FB0C9; } .slide-audience .sl-quote::after{ content:"\201D"; color:#7FB0C9; }
+  .slide-audience .sl-bullets{ list-style:none; padding:0; margin:0; font-size:16px; color:#9AA0A6; }
+  .slide-audience .sl-bullets li{ margin-bottom:8px; } .slide-audience .sl-bullets li::before{ content:"— "; color:#7FB0C9; }
+  .slide-audience .sl-visual{ margin-top:24px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:#9AA0A6; background:#1E1F24; border:1px solid #333438; border-radius:8px; padding:12px 20px; }
+  .presenter-wrap{ width:100vw; height:100vh; background:#F1F1EE; display:flex; flex-direction:column; padding:20px; }
+  .presenter-topbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; font-size:12px; color:var(--ink-dim); font-family:'IBM Plex Mono',monospace; }
+  .presenter-body{ flex:1; display:grid; grid-template-columns:1.1fr 1fr; gap:16px; }
+  .presenter-preview{ background:var(--canvas); border-radius:12px; border:1px solid var(--hairline); display:flex; align-items:center; justify-content:center; padding:20px; }
+  .presenter-preview .mini-quote{ color:var(--ink); font-size:20px; font-weight:600; text-align:center; }
+  .presenter-notes{ background:#fff; border:1px solid var(--hairline); border-radius:12px; padding:20px; overflow-y:auto; }
+  .presenter-notes h4{ margin:0 0 10px; font-size:12px; color:var(--ink-dim); text-transform:uppercase; }
+  .presenter-notes p{ font-size:14px; line-height:1.7; }
+  .presenter-controls{ display:flex; justify-content:center; align-items:center; gap:14px; margin-top:14px; }
+  .presenter-controls button{ background:#fff; border:1px solid var(--hairline); color:var(--ink); border-radius:8px; padding:10px 20px; font-size:14px; cursor:pointer; }
+  .exit-btn{ background:#fff; border:1px solid var(--hairline); color:var(--ink-dim); border-radius:6px; padding:5px 12px; font-size:11px; cursor:pointer; font-family:'IBM Plex Mono',monospace; }
+  .no-slides-note{ color:var(--ink-dim); font-size:13px; text-align:center; }
+</style>
+</head>
+<body>
+
+<!--
+  ============================================================================
+  SPRINT DATA — the orchestrator edits ONLY this JSON block after every stage.
+  Rendering JS below reads it. Do not hand-edit the rendered HTML elsewhere;
+  it will be overwritten by render() on load.
+
+  Structure:
+  - project: string, set once at stage 1
+  - stages: array of 10, {num, name, status: "not_started"|"in_progress"|"done", artifactLink}
+    Update the relevant entry's status/artifactLink immediately after that stage completes.
+  - quotableFindings: array, append one whenever a stage produces a "Quotable finding:" line
+    (stages 1 and 4 always do; others do if they produce one — see CONTEXT.md).
+    Each entry: {stage, eyebrow, quote, bullets: [], visual, notes}
+    These directly become Presenter-mode slides — do not author slides separately.
+  - narrative: {business, process, dev, portfolio} — HTML strings, empty until stage 10's
+    final pass. Leave empty ("") until then; the empty-state message renders automatically.
+  ============================================================================
+-->
+<script type="application/json" id="sprint-data">
+{
+  "project": "REPLACE_ME",
+  "stages": [
+    {"num":1, "name":"Discovery", "status":"not_started", "artifactLink":""},
+    {"num":2, "name":"User Research", "status":"not_started", "artifactLink":""},
+    {"num":3, "name":"Problem Def.", "status":"not_started", "artifactLink":""},
+    {"num":4, "name":"Ideation", "status":"not_started", "artifactLink":""},
+    {"num":5, "name":"Strategy", "status":"not_started", "artifactLink":""},
+    {"num":6, "name":"IA & Scope", "status":"not_started", "artifactLink":""},
+    {"num":7, "name":"Design System", "status":"not_started", "artifactLink":""},
+    {"num":8, "name":"Prototyping", "status":"not_started", "artifactLink":""},
+    {"num":9, "name":"Testing", "status":"not_started", "artifactLink":""},
+    {"num":10, "name":"Delivery", "status":"not_started", "artifactLink":""}
+  ],
+  "quotableFindings": [],
+  "narrative": { "business": "", "process": "", "dev": "", "portfolio": "" }
+}
+</script>
+
+<div style="display:flex; justify-content:flex-end; padding:14px 32px 0; max-width:920px; margin:0 auto;">
+  <button class="present-btn" onclick="startPresentation()">▶ Start Presentation</button>
+</div>
+
+<div class="maindoc">
+<header>
+  <div class="brand"><span class="brand-mark"></span><span id="hdr-project">DESIGN SPRINT</span> — CASE STUDY</div>
+  <h1 id="hdr-title">Case study (live — fills in as the sprint progresses)</h1>
+  <p class="subtitle" id="hdr-subtitle">This page was created at stage 1 and is refreshed after every
+    stage. Early on it shows mostly status; narrative content appears once stage 10 runs its final
+    pass. That's expected, not a bug — see docs/adr/0003 if you're wondering why.</p>
+
+  <div class="sprintmap" id="sprintmap"></div>
+  <div class="lifecycle-note" id="lifecycle-note"></div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="business" onclick="showTab('business')">Business</div>
+    <div class="tab" data-tab="process" onclick="showTab('process')">Process</div>
+    <div class="tab" data-tab="dev" onclick="showTab('dev')">Dev Handoff</div>
+    <div class="tab" data-tab="portfolio" onclick="showTab('portfolio')">Portfolio</div>
+  </div>
+</header>
+
+<main>
+  <div class="view active" id="view-business"></div>
+  <div class="view" id="view-process"></div>
+  <div class="view" id="view-dev"></div>
+  <div class="view" id="view-portfolio"></div>
+</main>
+</div>
+
+<div class="slidedeck audience" id="audienceDeck">
+  <div class="slide-audience">
+    <button onclick="window.close()" style="position:absolute; top:16px; left:16px; background:none; border:none; color:#9AA0A6; font-size:11px; cursor:pointer; opacity:.5;">✕ close</button>
+    <div class="sl-eyebrow" id="a-eyebrow"></div>
+    <div class="sl-quote" id="a-quote"></div>
+    <ul class="sl-bullets" id="a-bullets"></ul>
+    <div class="sl-visual" id="a-visual"></div>
+  </div>
+</div>
+
+<div class="slidedeck presenter" id="presenterDeck">
+  <div class="presenter-wrap">
+    <div class="presenter-topbar">
+      <span>PRESENTER VIEW</span>
+      <button class="exit-btn" onclick="exitPresentation()">← Back to Case Study</button>
+      <span id="p-counter"></span>
+    </div>
+    <div class="presenter-body">
+      <div class="presenter-preview"><div class="mini-quote" id="p-quote"></div></div>
+      <div class="presenter-notes"><h4>Speaker notes</h4><p id="p-notes"></p></div>
+    </div>
+    <div class="presenter-controls">
+      <button onclick="prevSlide()">← Prev</button>
+      <span class="slide-count mono" id="p-slidecount"></span>
+      <button onclick="nextSlide()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const DATA = JSON.parse(document.getElementById('sprint-data').textContent);
+  const SYNC_KEY = 'design-sprint-presenter-sync-' + DATA.project.replace(/\s+/g,'-').toLowerCase();
+  const params = new URLSearchParams(location.search);
+  const role = params.get('role');
+  if (role === 'audience') document.body.classList.add('role-audience');
+  if (role === 'presenter') document.body.classList.add('role-presenter');
+
+  function renderSprintMap(){
+    document.getElementById('hdr-project').textContent = DATA.project.toUpperCase();
+    document.getElementById('sprintmap').innerHTML = DATA.stages.map(s => {
+      const linkHtml = s.artifactLink ? `<a class="sm-link" href="${s.artifactLink}" onclick="event.stopPropagation()">↗</a>` : '';
+      return `<div class="sm-item status-${s.status}"><span class="sm-n mono">${String(s.num).padStart(2,'0')}</span>${s.name}${linkHtml}</div>`;
+    }).join('');
+    const doneCount = DATA.stages.filter(s => s.status === 'done').length;
+    document.getElementById('lifecycle-note').textContent =
+      `live aggregator · created at stage 01 · ${doneCount}/10 stages complete · refreshed after every stage`;
+  }
+
+  function renderNarrative(){
+    ['business','process','dev','portfolio'].forEach(key => {
+      const el = document.getElementById('view-' + key);
+      el.innerHTML = DATA.narrative[key] && DATA.narrative[key].trim()
+        ? DATA.narrative[key]
+        : `<div class="empty-view">Not yet available — stage 10 hasn't run its final narrative pass yet.<br>Current progress is visible in the Sprint Map above.</div>`;
+    });
+  }
+
+  function showTab(name){
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+  }
+
+  function startPresentation(){
+    const base = location.href.split('?')[0];
+    localStorage.setItem(SYNC_KEY, JSON.stringify({ index: 0 }));
+    window.open(base + '?role=audience', 'presentationAudience', 'width=1280,height=800');
+    window.location.href = base + '?role=presenter';
+  }
+  function getIndex(){ try{return JSON.parse(localStorage.getItem(SYNC_KEY)||'{"index":0}').index;}catch(e){return 0;} }
+  function setIndex(i){
+    const max = Math.max(0, DATA.quotableFindings.length - 1);
+    const c = Math.max(0, Math.min(max, i));
+    localStorage.setItem(SYNC_KEY, JSON.stringify({ index: c })); render(c);
+  }
+  function nextSlide(){ setIndex(getIndex()+1); } function prevSlide(){ setIndex(getIndex()-1); }
+  function exitPresentation(){ localStorage.setItem(SYNC_KEY, JSON.stringify({ index:getIndex(), closeRequested:true })); window.location.href = location.href.split('?')[0]; }
+
+  function render(i){
+    if (DATA.quotableFindings.length === 0) {
+      if (document.body.classList.contains('role-audience')) document.getElementById('a-quote').textContent = 'No quotable findings yet — sprint just getting started.';
+      if (document.body.classList.contains('role-presenter')) document.getElementById('p-notes').textContent = 'Nothing to present yet. Quotable findings appear as stages complete (stages 1 and 4 always produce one; check CONTEXT.md for others).';
+      return;
+    }
+    const s = DATA.quotableFindings[i];
+    if (document.body.classList.contains('role-audience')) {
+      document.getElementById('a-eyebrow').textContent = s.eyebrow || ('Stage ' + s.stage);
+      document.getElementById('a-quote').textContent = s.quote;
+      document.getElementById('a-bullets').innerHTML = (s.bullets||[]).map(b => `<li>${b}</li>`).join('');
+      document.getElementById('a-visual').textContent = s.visual || '';
+    }
+    if (document.body.classList.contains('role-presenter')) {
+      document.getElementById('p-quote').textContent = s.quote;
+      document.getElementById('p-notes').textContent = s.notes || '';
+      document.getElementById('p-counter').textContent = 'SLIDE ' + (i+1) + ' / ' + DATA.quotableFindings.length;
+      document.getElementById('p-slidecount').textContent = (i+1) + ' / ' + DATA.quotableFindings.length;
+    }
+  }
+
+  window.addEventListener('storage', (e) => {
+    if (e.key !== SYNC_KEY) return;
+    let d; try{ d = JSON.parse(e.newValue); } catch(err){ return; }
+    if (d.closeRequested && document.body.classList.contains('role-audience')) { window.close(); return; }
+    render(getIndex());
+  });
+
+  renderSprintMap();
+  renderNarrative();
+  if (role === 'audience' || role === 'presenter') render(getIndex());
+  if (role === 'presenter') document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') nextSlide(); if (e.key === 'ArrowLeft') prevSlide();
+  });
+</script>
+
+</body>
+</html>
